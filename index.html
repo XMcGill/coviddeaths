@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>Covid Deaths by Country</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: Lato, sans-serif;
+            color: #0D0000;
+        }
+        header {
+            padding: 6px 10%;
+        }
+        h1 {
+            display: inline-block;
+            margin-right: 20px;
+            color: #001323;
+        }
+        h2 {
+            display: inline-block;
+            color: #001323;
+        }
+        #map {
+            width: 80%;
+            height: 540px;
+            margin: 10px auto;
+        }
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+        p {
+            font-size: 1em;
+            color: #001323;
+        }
+
+        .legend {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0px;
+  margin-bottom: 20px;
+}
+
+.item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 20px;
+}
+
+.color {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+
+.yellow {
+  background-color: yellow;
+}
+
+.blue {
+  background-color: blue;
+}
+
+.red {
+  background-color: red;
+}
+
+.label {
+  font-size: 14px;
+}
+
+
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Covid Deaths by Country:</h1>
+        <h2>Proportional Symbol Map</h2>
+    </header>
+
+    <div id='map'></div>
+
+    <footer>
+        <p>Map authored by Alexandra McGill</p>
+        <p>Source Data: WHO-COVID-19-global-table-data.js</p>
+    </footer>
+
+    <script src="WHO-COVID-19-global-table-data.js"></script>
+    <script>
+
+      var map = L.map('map', {
+          center: [48.98448743334051, 1.4333305346284495],
+          zoom: 1.5,
+      });
+      
+      var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+          subdomains: 'abcd',
+          maxZoom: 19
+      });  
+      
+      tiles.addTo(map);
+        
+         
+    //step 2
+      
+ //   plants.features.sort(function(a, b) {
+   // return b.properties.capacity_mw - a.properties.capacity_mw;
+//});
+    
+    //step 1    and then change to step 3 with 'return'
+      var Deaths = L.geoJson(countries, {
+          pointToLayer: function(feature,latlng) {
+              console.log(feature.properties.Deaths_cumulative_total)
+              return L.circleMarker(latlng, {
+                 color: 'orange',
+                 weight: 2,
+                 fillColor: 'gray',
+                 fillOpacity: .5,
+                 radius: getRadius(feature.properties.Deaths_cumulative_total) //step4
+              });   
+          },
+          
+      filter : function(feature, layer){
+              if(feature.properties.Deaths_cumulative_total < 100000){
+                  return feature
+              };
+             // console.log(feature);
+          },
+         
+    //step 5
+    onEachFeature : function(feature,layer) {
+    layer.on('mouseover', function() {
+    layer.setStyle({
+        fillColor: 'yellow'
+    });
+});
+layer.on('mouseout', function() {
+    layer.setStyle({
+        fillColor: 'gray'
+    });
+});
+
+          
+          var name = feature.properties.Name
+          var num_deaths = feature.properties.Deaths_cumulative_total
+      
+                                                
+          
+          var popup = ("<b>"+name+"</b><br>"
+              +num_deaths+ " Deaths" + "<br>")
+                       layer.bindPopup(popup)
+          }
+          
+          
+      }).addTo(map);
+//step 4
+
+    var Deaths100000 = L.geoJson(countries, {
+          pointToLayer: function(feature,latlng) {
+              console.log(feature.properties.Deaths_cumulative_total)
+              return L.circleMarker(latlng, {
+                 color: 'orange',
+                 weight: 2,
+                 fillColor: 'gray',
+                 fillOpacity: .5,
+                 radius: getRadius(feature.properties.Deaths_cumulative_total) //step4
+              });   
+          },
+          
+      filter : function(feature, layer){
+              if(feature.properties.Deaths_cumulative_total > 100000 && feature.properties.Deaths_cumulative_total < 200000){
+                  return feature
+              };
+             // console.log(feature);
+          },
+         
+    //step 5
+    onEachFeature : function(feature,layer) {
+    layer.on('mouseover', function() {
+    layer.setStyle({
+        fillColor: 'blue'
+    });
+});
+layer.on('mouseout', function() {
+    layer.setStyle({
+        fillColor: 'gray'
+    });
+});
+
+var name = feature.properties.Name
+          var num_deaths = feature.properties.Deaths_cumulative_total
+      
+                                                
+          
+          var popup = ("<b>"+name+"</b><br>"
+              +num_deaths+ " Deaths" + "<br>")
+                       layer.bindPopup(popup)
+          }
+
+        }).addTo(map);
+
+var Deaths200000 = L.geoJson(countries, {
+          pointToLayer: function(feature,latlng) {
+              console.log(feature.properties.Deaths_cumulative_total)
+              return L.circleMarker(latlng, {
+                 color: 'orange',
+                 weight: 2,
+                 fillColor: 'gray',
+                 fillOpacity: .5,
+                 radius: getRadius(feature.properties.Deaths_cumulative_total) //step4
+              });   
+          },
+          
+      filter : function(feature, layer){
+              if(feature.properties.Deaths_cumulative_total > 200000){
+                  return feature
+              };
+             // console.log(feature);
+          },
+         
+    //step 5
+    onEachFeature : function(feature,layer) {
+    layer.on('mouseover', function() {
+    layer.setStyle({
+        fillColor: 'red'
+    });
+});
+layer.on('mouseout', function() {
+    layer.setStyle({
+        fillColor: 'gray'
+    });
+});
+
+          //step 6  
+          
+          var name = feature.properties.Name
+          var num_deaths = feature.properties.Deaths_cumulative_total
+      
+                                                
+          
+          var popup = ("<b>"+name+"</b><br>"
+              +num_deaths+ " Deaths" + "<br>")
+                       layer.bindPopup(popup)
+          }
+          
+          
+      }).addTo(map);
+//step 4
+        function getRadius(area){
+        var radius = Math.sqrt(area/Math.PI);
+        return radius * .1  
+    }
+
+    </script>
+    
+    <div class="legend">
+        <div class="item">
+          <div class="color yellow"></div>
+          <div class="label">Less than 100,000 Deaths</div>
+        </div>
+        <div class="item">
+          <div class="color blue"></div>
+          <div class="label">Between 100,000 and 200,000 Deaths</div>
+        </div>
+        <div class="item">
+          <div class="color red"></div>
+          <div class="label">More than 200,000 Deaths</div>
+        </div>
+      </div>
+      
+</body>
+
+</html>
